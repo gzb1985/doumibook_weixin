@@ -11,4 +11,4 @@ doumibook_weixin
 
     pip install Flask
 
-另外需要申请一个豆瓣api：http://developers.douban.com/
+另外需要申请一个豆瓣api key，申请到这里：http://developers.douban.com/
