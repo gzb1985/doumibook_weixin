@@ -145,10 +145,6 @@ def book_search_test():
     resp = urllib2.urlopen(url)
     return resp.read()
 
-from private_const import app_secret_key
-app.debug = True
-app.secret_key = app_secret_key
-
 
 if __name__ == '__main__':
     app.run()
