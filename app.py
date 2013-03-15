@@ -24,6 +24,7 @@ app.secret_key = app_secret_key
 def home():
 	return render_template('index.html')
 
+#微信消息服务器接入
 @app.route('/weixin', methods=['GET'])
 def weixin_verify():
     signature = request.args.get('signature')
@@ -31,7 +32,7 @@ def weixin_verify():
     nonce = request.args.get('nonce')
     echostr = request.args.get('echostr')
     
-    token = 'doumi'
+    token = 'doumi' #注意要与微信公众帐号平台上填写一致
     tmplist = [token, timestamp, nonce]
     tmplist.sort()
     tmpstr = ''.join(tmplist)
@@ -126,6 +127,7 @@ def response_news_msg(recvmsg, books):
     msg += msgEnd
     return msg
 
+#来自微信的消息推送
 @app.route('/weixin', methods=['POST'])
 def weixin_msg():
     data = request.data
@@ -136,14 +138,6 @@ def weixin_msg():
         rmsg = response_news_msg(msg, books)
         return rmsg
     return 'error'
-
-@app.route('/test', methods=['GET'])
-def book_search_test():
-    q = request.args.get('q')
-    params = {'q': q.encode('utf-8'), 'apikey': DOUBAN_APIKEY, 'count': 3}
-    url = bookurlbase + '?' + urllib.urlencode(params)
-    resp = urllib2.urlopen(url)
-    return resp.read()
 
 
 if __name__ == '__main__':
