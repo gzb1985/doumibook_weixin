@@ -15,7 +15,8 @@ app.secret_key = APP_SECRET_KEY
 def home():
 	return render_template('index.html')
 
-#微信消息服务器网址接入验证，需要在公众帐号管理台手动提交
+#公众号消息服务器网址接入验证
+#需要在公众帐号管理台手动提交, 验证后方可接收微信服务器的消息推送
 @app.route('/weixin', methods=['GET'])
 def weixin_access_verify():
     echostr = request.args.get('echostr')
@@ -23,7 +24,7 @@ def weixin_access_verify():
         return echostr
     return 'access verification fail'
 
-#消息推送
+#来自微信服务器的消息推送
 @app.route('/weixin', methods=['POST'])
 def weixin_msg():
     if verification(request):
@@ -70,6 +71,7 @@ def search_book(q):
     books = r['books']
     return books
 
+
 NEWS_MSG_HEADER_TPL = \
 u"""
 <xml>
@@ -108,13 +110,14 @@ def make_articles(books):
             msg += make_item(book, i+1)
     return msg
 
+
 NEWS_MSG_ITEM_TPL = \
 u"""
 <item>
-    <Title><![CDATA[%s]]></Title>
-    <Description><![CDATA[%s]]></Description>
-    <PicUrl><![CDATA[%s]]></PicUrl>
-    <Url><![CDATA[%s]]></Url>
+<Title><![CDATA[%s]]></Title>
+<Description><![CDATA[%s]]></Description>
+<PicUrl><![CDATA[%s]]></PicUrl>
+<Url><![CDATA[%s]]></Url>
 </item>
 """
 
