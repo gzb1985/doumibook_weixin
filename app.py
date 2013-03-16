@@ -20,7 +20,7 @@ def home():
 @app.route('/weixin', methods=['GET'])
 def weixin_access_verify():
     echostr = request.args.get('echostr')
-    if verification(request) and not echostr:
+    if verification(request) and echostr is not None:
         return echostr
     return 'access verification fail'
 
