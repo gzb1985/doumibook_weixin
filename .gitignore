@@ -20,6 +20,9 @@ develop-eggs
 lib
 lib64
 
+#virtualenv
+venv
+
 # Installer logs
 pip-log.txt
 
@@ -35,3 +38,5 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+

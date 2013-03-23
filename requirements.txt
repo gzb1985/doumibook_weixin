@@ -1,0 +1,4 @@
+Flask==0.9
+Jinja2==2.6
+SQLAlchemy==0.8.0b2
+Werkzeug==0.8.3
