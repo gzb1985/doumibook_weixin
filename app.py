@@ -13,7 +13,7 @@ app.secret_key = APP_SECRET_KEY
 #homepage just for fun
 @app.route('/')
 def home():
-	return render_template('index.html')
+    return render_template('index.html')
 
 #公众号消息服务器网址接入验证
 #需要在公众帐号管理台手动提交, 验证后方可接收微信服务器的消息推送
