@@ -1,6 +1,6 @@
 #!/bin/env python
 # -*- coding: utf-8 -*- 
-import hashlib, urllib, urllib2, re
+import hashlib, urllib, urllib2, re, time, json
 import xml.etree.ElementTree as ET
 from flask import Flask, request, render_template
 from util import deployed_on_sae
@@ -30,11 +30,16 @@ def weixin_msg():
     if verification(request):
         data = request.data
         msg = parse_msg(data)
-        if msg.has_key('Content'):
-            q = msg['Content']
-            books = search_book(q)
-            rmsg = response_news_msg(msg, books)
-            return rmsg
+        if user_subscribe_event(msg):
+            return help_info(msg)
+        elif is_text_msg(msg):
+            content = msg['Content']
+            if content == u'?' or content == u'？':
+                return help_info(msg)
+            else:
+                books = search_book(content)
+                rmsg = response_news_msg(msg, books)
+                return rmsg
     return 'message processing fail'
 
 #接入和消息推送都需要做校验
@@ -61,6 +66,24 @@ def parse_msg(rawmsgstr):
         msg[child.tag] = child.text
     return msg
 
+def is_text_msg(msg):
+    return msg['MsgType'] == 'text'
+
+def user_subscribe_event(msg):
+    return msg['MsgType'] == 'event' and msg['Event'] == 'subscribe'
+
+HELP_INFO = \
+u"""
+欢迎关注豆米查书^_^
+
+直接发送书名、作者或ISBN号等关键字，即可查询书籍信息
+
+如发送“东野圭吾”，将回复豆瓣查询到的三条数据记录
+"""
+
+def help_info(msg):
+    return response_text_msg(msg, HELP_INFO)
+
 #访问豆瓣API获取书籍数据
 BOOK_URL_BASE = 'http://api.douban.com/v2/book/search'
 def search_book(q):
@@ -70,7 +93,6 @@ def search_book(q):
     r = json.loads(resp.read())
     books = r['books']
     return books
-
 
 NEWS_MSG_HEADER_TPL = \
 u"""
@@ -94,7 +116,7 @@ u"""
 #消息回复，采用news图文消息格式
 def response_news_msg(recvmsg, books):
     msgHeader = NEWS_MSG_HEADER_TPL % (recvmsg['FromUserName'], recvmsg['ToUserName'], 
-        recvmsg['CreateTime'], len(books))
+        str(int(time.time())), len(books))
     msg = ''
     msg += msgHeader
     msg += make_articles(books)
@@ -110,14 +132,13 @@ def make_articles(books):
             msg += make_item(book, i+1)
     return msg
 
-
 NEWS_MSG_ITEM_TPL = \
 u"""
 <item>
-<Title><![CDATA[%s]]></Title>
-<Description><![CDATA[%s]]></Description>
-<PicUrl><![CDATA[%s]]></PicUrl>
-<Url><![CDATA[%s]]></Url>
+    <Title><![CDATA[%s]]></Title>
+    <Description><![CDATA[%s]]></Description>
+    <PicUrl><![CDATA[%s]]></PicUrl>
+    <Url><![CDATA[%s]]></Url>
 </item>
 """
 
@@ -138,6 +159,23 @@ def make_single_item(book):
     url = re.sub('http://douban','http://m.douban', book['alt'])
     item = NEWS_MSG_ITEM_TPL % (title, description, picUrl, url)
     return item
+
+TEXT_MSG_TPL = \
+u"""
+<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[%s]]></Content>
+<FuncFlag>0</FuncFlag>
+</xml>
+"""
+
+def response_text_msg(msg, content):
+    s = TEXT_MSG_TPL % (msg['FromUserName'], msg['ToUserName'], 
+        str(int(time.time())), content)
+    return s
 
 
 if __name__ == '__main__':
