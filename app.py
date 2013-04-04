@@ -3,7 +3,6 @@
 import hashlib, urllib, urllib2, re, time, json
 import xml.etree.ElementTree as ET
 from flask import Flask, request, render_template
-from util import deployed_on_sae
 from private_const import APP_SECRET_KEY, DOUBAN_APIKEY
 
 app = Flask(__name__)
