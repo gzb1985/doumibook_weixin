@@ -146,7 +146,7 @@ def make_item(book, itemindex):
         ','.join(book['author']), book['publisher'], book['price'])
     description = ''
     picUrl = book['images']['large'] if itemindex == 1 else book['images']['small']
-    url = re.sub('http://douban','http://m.douban', book['alt'])
+    url = book['alt']
     item = NEWS_MSG_ITEM_TPL % (title, description, picUrl, url)
     return item
 
@@ -155,7 +155,7 @@ def make_single_item(book):
     title = u'%s\t%s分' % (book['title'], book['rating']['average'])
     description = '%s\n%s\t%s' % (','.join(book['author']), book['publisher'], book['price'])
     picUrl = book['images']['large']
-    url = re.sub('http://douban','http://m.douban', book['alt'])
+    url = book['alt']
     item = NEWS_MSG_ITEM_TPL % (title, description, picUrl, url)
     return item
 
